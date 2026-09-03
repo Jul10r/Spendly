@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spendly Backend Architecture & Master Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.65;
+            padding: 24px 16px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: #374151;
+        }
+
+        .diagram-container {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        .diagram-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            margin: 14px 0;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.88em;
+            background: #f1f5f9;
+            color: #d946ef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border: none;
+        }
+
+        .callout {
+            border-left: 4px solid;
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 18px 0;
+        }
+
+        .callout.info {
+            background: var(--info-light);
+            border-color: var(--info);
+            color: #0369a1;
+        }
+
+        .callout.success {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: #047857;
+        }
+
+        .callout.warning {
+            background: var(--warning-light);
+            border-color: var(--warning);
+            color: #b45309;
+        }
+
+        .callout.danger {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: #b91c1c;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 0.92rem;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr:hover {
+            background: #fdfdfd;
+        }
+
+        .method-badge {
+            display: inline-block;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: white;
+        }
+
+        .method-get { background: #0284c7; }
+        .method-post { background: #16a34a; }
+        .method-put { background: #d97706; }
+        .method-delete { background: #dc2626; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        @media (min-width: 640px) {
+            .grid-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .step-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                color: black;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+            header {
+                background: #4f46e5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="badge">Phase 1 & 2 Completed</div>
+        <h1>Spendly: Backend Master Architecture</h1>
+        <p>A complete conceptual and technical guide covering Express, MongoDB, RESTful design, validation guards, and data flow.</p>
+    </header>
+
+    <!-- SECTION 1: ARCHITECTURE OVERVIEW -->
+    <div class="card">
+        <h2>🏛️ 1. High-Level Architecture</h2>
+        <p>Spendly is designed using a clean, layered architecture where each file has a single, well-defined responsibility.</p>
+        
+        <div class="diagram-container">
+            <div class="diagram-title">System Layer Flow</div>
+            <pre class="mermaid">
+flowchart TD
+    Client["📱 Client / Frontend (React App)"]
+    
+    subgraph Backend ["🖥️ Node.js Express Server (Port 3000)"]
+        Index["index.js (Entry Point)"]
+        CORS["Middleware: cors() & express.json()"]
+        Router["routes/transactionRoutes.js (The Waiter)"]
+        Controller["controllers/transactionController.js (The Chef)"]
+        Config["config/db.js (DB Singleton)"]
+    end
+    
+    subgraph Database ["☁️ Cloud Database"]
+        Atlas[("MongoDB Atlas (Cluster0 / spendly)")]
+    end
+
+    Client -->|"HTTP Requests (GET, POST, PUT, DELETE)"| Index
+    Index --> CORS
+    CORS --> Router
+    Router --> Controller
+    Controller -->|"Queries (find, insertOne, deleteOne)"| Config
+    Config <-->|"TLS Connection (SRV 8.8.8.8)"| Atlas
+    Controller -->|"JSON Response & Status Codes"| Client
+            </pre>
+        </div>
+
+        <div class="grid-2">
+            <div class="step-box">
+                <h4>🚪 <code>index.js</code> (Entry Point)</h4>
+                <p>Loads environment variables, initializes Express, attaches global middleware (CORS, JSON body parser), and mounts routes.</p>
+            </div>
+            <div class="step-box">
+                <h4>🚦 <code>routes/</code> (The Waiter)</h4>
+                <p>Maps incoming HTTP methods and URL paths (e.g. <code>POST /transactions</code>) directly to controller functions.</p>
+            </div>
+            <div class="step-box">
+                <h4>🧠 <code>controllers/</code> (The Chef)</h4>
+                <p>Contains all business logic: runs input validation guards, computes math, and talks to MongoDB.</p>
+            </div>
+            <div class="step-box">
+                <h4>🔌 <code>config/db.js</code> (The Connection)</h4>
+                <p>Establishes and shares a single persistent connection pool to MongoDB Atlas across the server.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: THE REQUEST LIFECYCLE -->
+    <div class="card">
+        <h2>🔄 2. Detailed Request-Response Lifecycle</h2>
+        <p>Here is what happens step-by-step when a user logs a new expense ($45 for Lunch):</p>
+
+        <div class="diagram-container">
+            <div class="diagram-title">Sequence Diagram: POST /transactions</div>
+            <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as 👤 User
+    participant React as 📱 React Frontend
+    participant Server as ⚡ Express (index.js)
+    participant Router as 🚦 transactionRoutes.js
+    participant Controller as 🧠 transactionController.js
+    participant Mongo as 🍃 MongoDB Atlas
+
+    User->>React: Fills form & clicks "Add Transaction"
+    React->>Server: POST /transactions {type: "expense", amount: 45, category: "Food"}
+    Server->>Server: cors() allows origin & express.json() parses body
+    Server->>Router: Forward to /transactions router
+    Router->>Controller: Route to createTransaction(req, res)
+    
+    Note over Controller: Validation Guards:<br/>1. Is type 'income' or 'expense'?<br/>2. Is amount > 0 and a number?<br/>3. Is category provided?
+    
+    alt Validation Failed
+        Controller-->>React: 400 Bad Request { message: "..." }
+        React-->>User: Shows error alert
+    else Validation Passed
+        Controller->>Mongo: insertOne({ type, amount, category, date, createdAt })
+        Mongo-->>Controller: { acknowledged: true, insertedId: ObjectId(...) }
+        Controller-->>React: 201 Created { message: "Success", transaction: { ... } }
+        React-->>User: Updates Dashboard balance & transaction list instantly
+    end
+            </pre>
+        </div>
+    </div>
+
+    <!-- SECTION 3: VALIDATION & GUARD CLAUSES -->
+    <div class="card">
+        <h2>🛡️ 3. Input Validation & Guard Clauses</h2>
+        <p>In professional backend engineering, we use the <strong>Guard Clause Pattern</strong> (checking for bad input first and rejecting early) to keep our database clean.</p>
+
+        <div class="diagram-container">
+            <div class="diagram-title">Validation Decision Tree</div>
+            <pre class="mermaid">
+flowchart TD
+    Start["Incoming Request Body"] --> CheckType{"Is type 'income' OR 'expense'?"}
+    
+    CheckType -- No --> ErrType["🛑 Return 400: Invalid Type"]
+    CheckType -- Yes --> CheckAmount{"Is amount a valid number > 0?"}
+    
+    CheckAmount -- No --> ErrAmount["🛑 Return 400: Invalid Amount"]
+    CheckAmount -- Yes --> CheckCategory{"Is category non-empty string?"}
+    
+    CheckCategory -- No --> ErrCategory["🛑 Return 400: Category Required"]
+    CheckCategory -- Yes --> CleanData["✨ Normalize: Number(amount), trim() strings, set default date"]
+    
+    CleanData --> SaveDB[("🍃 Save to MongoDB")]
+    SaveDB --> Success["✅ Return 201 Created"]
+            </pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">💡 Why did we use <code>&&</code> instead of <code>||</code>?</div>
+            <p><code>if (!type || (type !== 'income' && type !== 'expense'))</code></p>
+            <p>If we used <code>||</code>, the expression would always evaluate to true for every string in the universe, because a word can never be both <code>'income'</code> AND <code>'expense'</code> at the same time. Using <code>&&</code> correctly checks that the input is neither one.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 4: DATABASE & OBJECTID -->
+    <div class="card">
+        <h2>🍃 4. MongoDB Model & ObjectId Mechanics</h2>
+
+        <p>In MongoDB, data is stored in JSON-like documents inside collections:</p>
+
+        <div class="diagram-container">
+            <div class="diagram-title">Transaction Document Schema</div>
+            <pre class="mermaid">
+classDiagram
+    class TransactionDocument {
+        +ObjectId _id : "65f1a2b3c4d5e6f7a8b9c0d1"
+        +String type : "income" | "expense"
+        +Number amount : 1250.00
+        +String category : "Salary" | "Food" | "Rent"
+        +String date : "2026-09-01"
+        +String description : "Monthly paycheck"
+        +Date createdAt : 2026-09-01T14:30:00.000Z
+    }
+            </pre>
+        </div>
+
+        <div class="callout info">
+            <div class="callout-title">🔑 Why <code>new ObjectId(id)</code> is Required</div>
+            <p>MongoDB's <code>_id</code> is stored as a 12-byte binary BSON type, not a plain JavaScript string. If you query MongoDB with <code>{ _id: "65f..." }</code> as a string, MongoDB will never find the match. We must convert it using <code>new ObjectId(id)</code> and always check <code>ObjectId.isValid(id)</code> first to avoid runtime crashes.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 5: API ENDPOINTS MATRIX -->
+    <div class="card">
+        <h2>📊 5. REST API Endpoints Reference</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Purpose</th>
+                    <th>Success Status</th>
+                    <th>Error Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/transactions/summary</code></td>
+                    <td>Calculates total income, total expense, and balance</td>
+                    <td><code>200 OK</code></td>
+                    <td><code>500 Server Error</code></td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/transactions</code></td>
+                    <td>Fetches array of all transactions</td>
+                    <td><code>200 OK</code></td>
+                    <td><code>500 Server Error</code></td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/transactions</code></td>
+                    <td>Creates a new income or expense</td>
+                    <td><code>201 Created</code></td>
+                    <td><code>400 Bad Request</code></td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-put">PUT</span></td>
+                    <td><code>/transactions/:id</code></td>
+                    <td>Updates existing transaction fields</td>
+                    <td><code>200 OK</code></td>
+                    <td><code>400 / 404 / 500</code></td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>/transactions/:id</code></td>
+                    <td>Deletes a transaction by its MongoDB ID</td>
+                    <td><code>200 OK</code></td>
+                    <td><code>400 / 404 / 500</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION 6: ROADMAP & NEXT PHASE -->
+    <div class="card">
+        <h2>🚀 6. Next Up: Phase 3 (React + Vite Frontend)</h2>
+        <p>Now that the backend is complete, robust, and tested with MongoDB, here is how we will build the user interface:</p>
+
+        <div class="diagram-container">
+            <div class="diagram-title">Frontend Component Hierarchy</div>
+            <pre class="mermaid">
+graph TD
+    App["App.jsx (Main Container & State Manager)"]
+    
+    App --> Navbar["Navbar.jsx (Brand & Balance Badge)"]
+    App --> SummaryCards["SummaryCards.jsx (Income, Expense, Balance)"]
+    App --> TransactionForm["TransactionForm.jsx (Add / Edit Modal)"]
+    App --> TransactionList["TransactionList.jsx (Table / Cards)"]
+    
+    TransactionList --> TransactionItem["TransactionItem.jsx (Single Row with Delete & Edit)"]
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>
