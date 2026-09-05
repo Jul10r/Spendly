@@ -18,6 +18,7 @@ import DashboardPage from './pages/DashboardPage';
 import IncomesPage from './pages/IncomesPage';
 import ExpensesPage from './pages/ExpensesPage';
 import ProfilePage from './pages/ProfilePage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 export default function App() {
     const [token, setToken] = useState(() => localStorage.getItem('token'));
@@ -138,6 +139,7 @@ export default function App() {
                 <Routes>
                     <Route path="/login" element={<LoginPage onLoginSuccess={handleAuthSuccess} />} />
                     <Route path="/signup" element={<SignupPage onSignupSuccess={handleAuthSuccess} />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
             </div>
