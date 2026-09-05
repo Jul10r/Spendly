@@ -69,4 +69,40 @@ export const updateTransaction = async (id, data) => {
     });
 
     return await response.json()
-}; 
+};
+
+export const verifyEmail = async (data) => {
+    const response = await fetch(`${AUTH_URL}/verify-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+};
+
+export const resendCode = async (data) => {
+    const response = await fetch(`${AUTH_URL}/resend-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+};
+
+export const forgotPassword = async (data) => {
+    const response = await fetch(`${AUTH_URL}/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+};
+
+export const resetPassword = async (data) => {
+    const response = await fetch(`${AUTH_URL}/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+};

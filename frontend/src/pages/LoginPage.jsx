@@ -69,9 +69,14 @@ export default function LoginPage({ onLoginSuccess }) {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                            Password
-                        </label>
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
+                                Password
+                            </label>
+                            <Link to="/forgot-password" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                                Forgot password?
+                            </Link>
+                        </div>
                         <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                                 <Lock size={18} />
