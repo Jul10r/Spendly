@@ -1,6 +1,9 @@
-# Spendly
+# Spendly 💸
 
 A full-stack personal finance tracker that helps you manage your income, expenses, and monthly budgets with private, secure user accounts.
+
+🚀 **Live Demo**: [https://spendly-nine-pi.vercel.app](https://spendly-nine-pi.vercel.app)  
+> **Note on Free Hosting**: The backend is deployed on Render's free tier. If the app hasn't been visited recently, the server may take ~30–45 seconds to spin up on your first request.
 
 Built with React, Vite, Tailwind CSS, Node.js, Express, and MongoDB Atlas.
 
