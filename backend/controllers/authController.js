@@ -45,10 +45,10 @@ const signup = async (req, res) => {
         await sendVerificationCode(newUser.email, verificationCode);
 
         return res.status(201).json({
-            message: "Registration successful! Please check your email for the verification code. ",
+            message: "Registration successful! Please check your email for the verification code.",
             email: newUser.email,
             requiresVerification: true
-        })
+        });
 
     } catch (err) {
         console.error("Failed to SignUp ", err);
@@ -194,7 +194,9 @@ const resendVerificationCode = async (req, res) => {
 
         await sendVerificationCode(user.email, newCode);
 
-        return res.status(200).json({ message: "A new verification code has been sent to your email." })
+        return res.status(200).json({
+            message: "A new verification code has been sent to your email."
+        });
 
     } catch (err) {
         console.error("Unable to resend code: ", err);
@@ -210,9 +212,11 @@ const forgotPassword = async (req, res) => {
             return res.status(400).json({ message: "Please provide your email address." });
         }
 
-        const user = await getUsers().findOne({ email: email.toLowerCase().trim() });
+        const normalizedEmail = email.toLowerCase().trim();
+        const user = await getUsers().findOne({ email: normalizedEmail });
 
         if (!user) {
+            console.log(`ℹ️ [forgotPassword] Password reset requested for unregistered email: "${normalizedEmail}". No account found.`);
             return res.status(200).json({ message: "If an account with that email exists, a reset code has been sent." });
         }
 
@@ -231,7 +235,9 @@ const forgotPassword = async (req, res) => {
 
         await sendPasswordResetEmail(user.email, resetCode);
 
-        return res.status(200).json({ message: "If an account with that email exists, a reset code has been sent." });
+        return res.status(200).json({
+            message: "If an account with that email exists, a reset code has been sent."
+        });
 
     } catch (err) {
         console.error("Error in forgotPassword:", err);

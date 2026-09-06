@@ -32,6 +32,10 @@ export default function ForgotPasswordPage() {
 
         try {
             const data = await forgotPassword({ email });
+            if (data.message && data.message.toLowerCase().includes('server error')) {
+                setError(data.message);
+                return;
+            }
             setSuccessMsg(data.message || 'If an account exists, a code was sent.');
             setStep(2);
             setResendCooldown(60);
@@ -82,7 +86,7 @@ export default function ForgotPasswordPage() {
 
         try {
             const data = await forgotPassword({ email });
-            setSuccessMsg('A new reset code has been sent to your email.');
+            setSuccessMsg(data.message || 'A new reset code has been sent to your email.');
             setResendCooldown(60);
         } catch (err) {
             console.error('Resend error:', err);
@@ -161,7 +165,7 @@ export default function ForgotPasswordPage() {
                         </div>
 
                         {successMsg && (
-                            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm font-semibold">
+                            <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm font-semibold">
                                 <CheckCircle2 size={18} className="shrink-0" />
                                 <span>{successMsg}</span>
                             </div>

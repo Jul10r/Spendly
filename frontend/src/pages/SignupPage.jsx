@@ -111,7 +111,7 @@ export default function SignupPage({ onSignupSuccess }) {
                         </div>
 
                         {successMsg && (
-                            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm font-semibold">
+                            <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm font-semibold">
                                 <CheckCircle2 size={18} className="shrink-0" />
                                 <span>{successMsg}</span>
                             </div>

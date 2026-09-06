@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { authLimiter, codeLimiter } = require('../middleware/rateLimiter')
 const { signup,
     login,
     verifyEmail,
@@ -9,11 +10,11 @@ const { signup,
 } = require('../controllers/authController');
 
 
-router.post('/signup', signup)
-router.post('/login', login)
-router.post('/verify-email', verifyEmail)
-router.post('/resend-code', resendVerificationCode)
-router.post('/forgot-password', forgotPassword)
-router.post('/reset-password', resetPassword)
+router.post('/signup', authLimiter, signup)
+router.post('/login', authLimiter, login)
+router.post('/verify-email', codeLimiter, verifyEmail)
+router.post('/resend-code', authLimiter, resendVerificationCode)
+router.post('/forgot-password', authLimiter, forgotPassword)
+router.post('/reset-password', codeLimiter, resetPassword)
 
 module.exports = router;
