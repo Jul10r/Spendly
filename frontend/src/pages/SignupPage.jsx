@@ -5,12 +5,12 @@ import { UserPlus, User, Mail, Lock, AlertCircle, ArrowRight, CheckCircle2, Rota
 
 export default function SignupPage({ onSignupSuccess }) {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(() => sessionStorage.getItem('pendingVerificationEmail') || '');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const [isVerifying, setIsVerifying] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(() => Boolean(sessionStorage.getItem('pendingVerificationEmail')));
     const [code, setCode] = useState('');
     const [resendCooldown, setResendCooldown] = useState(0);
     const [successMsg, setSuccessMsg] = useState('');
@@ -43,7 +43,9 @@ export default function SignupPage({ onSignupSuccess }) {
                 setIsVerifying(true);
                 setSuccessMsg(data.message);
                 setResendCooldown(60);
+                sessionStorage.setItem('pendingVerificationEmail', data.email || email);
             } else if (data.token && data.user) {
+                sessionStorage.removeItem('pendingVerificationEmail');
                 onSignupSuccess(data.token, data.user);
             } else {
                 setError(data.message || 'Registration failed. Please check your details.');
@@ -65,6 +67,7 @@ export default function SignupPage({ onSignupSuccess }) {
             const data = await verifyEmail({ email, code });
 
             if (data.token && data.user) {
+                sessionStorage.removeItem('pendingVerificationEmail');
                 onSignupSuccess(data.token, data.user);
             } else {
                 setError(data.message || 'Verification failed. Please check your code.');
@@ -167,7 +170,12 @@ export default function SignupPage({ onSignupSuccess }) {
 
                                 <button
                                     type="button"
-                                    onClick={() => { setIsVerifying(false); setError(''); setSuccessMsg(''); }}
+                                    onClick={() => {
+                                        sessionStorage.removeItem('pendingVerificationEmail');
+                                        setIsVerifying(false);
+                                        setError('');
+                                        setSuccessMsg('');
+                                    }}
                                     className="text-xs font-semibold text-slate-500 hover:text-slate-700 cursor-pointer"
                                 >
                                     Edit details / Back

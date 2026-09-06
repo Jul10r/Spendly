@@ -19,8 +19,39 @@ const signup = async (req, res) => {
             return res.status(400).json({ message: "Password must be at least 6 characters." })
         }
 
-        if (await getUsers().findOne({ email: email.toLowerCase().trim() })) {
-            return res.status(400).json({ message: "Email already registered." })
+        const normalizedEmail = email.toLowerCase().trim();
+        const existingUser = await getUsers().findOne({ email: normalizedEmail });
+
+        if (existingUser) {
+            if (existingUser.isVerified) {
+                return res.status(400).json({ message: "Email already registered." });
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const psw = await bcrypt.hash(password, salt);
+            const verificationCode = crypto.randomInt(100000, 999999).toString();
+            const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+            await getUsers().updateOne(
+                { _id: existingUser._id },
+                {
+                    $set: {
+                        name: name.trim(),
+                        password: psw,
+                        verificationCode: verificationCode,
+                        verificationCodeExpires: verificationCodeExpires,
+                        updatedAt: new Date()
+                    }
+                }
+            );
+
+            await sendVerificationCode(existingUser.email, verificationCode);
+
+            return res.status(200).json({
+                message: "An unverified account with this email was found. A fresh verification code has been sent!",
+                email: existingUser.email,
+                requiresVerification: true
+            });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -32,7 +63,7 @@ const signup = async (req, res) => {
 
         const newUser = {
             name: name.trim(),
-            email: email.toLowerCase().trim(),
+            email: normalizedEmail,
             password: psw,
             isVerified: false,
             verificationCode: verificationCode,
@@ -64,7 +95,8 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Please provide email and password!" })
         }
 
-        const user = await getUsers().findOne({ email: email.toLowerCase().trim() })
+        const normalizedEmail = email.toLowerCase().trim();
+        const user = await getUsers().findOne({ email: normalizedEmail });
 
         if (!user) {
             return res.status(400).json({ message: "Invalid email or password!" })
@@ -77,8 +109,28 @@ const login = async (req, res) => {
         }
 
         if (user.isVerified === false) {
+            let message = "Please verify your email before logging in.";
+
+            if (!user.verificationCode || !user.verificationCodeExpires || new Date() > new Date(user.verificationCodeExpires)) {
+                const newCode = crypto.randomInt(100000, 999999).toString();
+                const newExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+                await getUsers().updateOne(
+                    { _id: user._id },
+                    {
+                        $set: {
+                            verificationCode: newCode,
+                            verificationCodeExpires: newExpires
+                        }
+                    }
+                );
+
+                await sendVerificationCode(user.email, newCode);
+                message = "Your verification code was expired. A fresh code has been sent to your email.";
+            }
+
             return res.status(403).json({
-                message: "Please verify your email before logging in.",
+                message,
                 requiresVerification: true,
                 email: user.email
             });
